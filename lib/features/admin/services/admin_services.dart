@@ -24,46 +24,48 @@ class AdminServices {
   }) async {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
 
-    try {
-      final cloudinary = CloudinaryPublic('denfgaxvg', 'uszbstnu');
-      List<String> imageUrls = [];
+try {
+  final cloudinary = CloudinaryPublic('denfgaxvg', '671876757471178');
+  List<String> imageUrls = [];
 
-      for (int i = 0; i < images.length; i++) {
-        CloudinaryResponse res = await cloudinary.uploadFile(
-          CloudinaryFile.fromFile(images[i].path, folder: name),
-        );
-        imageUrls.add(res.secureUrl);
-      }
+  for (int i = 0; i < images.length; i++) {
+    CloudinaryResponse res = await cloudinary.uploadFile(
+      CloudinaryFile.fromFile(images[i].path, folder: name),
+      uploadPreset: 'presetName', // Set the upload preset name here
+    );
+    imageUrls.add(res.secureUrl);
+  }
 
-      Product product = Product(
-        name: name,
-        description: description,
-        quantity: quantity,
-        images: imageUrls,
-        category: category,
-        price: price,
-      );
+  Product product = Product(
+    name: name,
+    description: description,
+    quantity: quantity,
+    images: imageUrls,
+    category: category,
+    price: price,
+  );
 
-      http.Response res = await http.post(
-        Uri.parse('$uri/admin/add-product'),
-        headers: {
-          'Content-Type': 'application/json; charset=UTF-8',
-          'x-auth-token': userProvider.user.token,
-        },
-        body: product.toJson(),
-      );
+  http.Response res = await http.post(
+    Uri.parse('$uri/admin/add-product'),
+    headers: {
+      'Content-Type': 'application/json; charset=UTF-8',
+      'x-auth-token': userProvider.user.token,
+    },
+    body: product.toJson(),
+  );
 
-      httpErrorHandle(
-        response: res,
-        context: context,
-        onSuccess: () {
-          showSnackBar(context, 'Product Added Successfully!');
-          Navigator.pop(context);
-        },
-      );
-    } catch (e) {
-      showSnackBar(context, e.toString());
-    }
+  httpErrorHandle(
+    response: res,
+    context: context,
+    onSuccess: () {
+      showSnackBar(context, 'Product Added Successfully!');
+      Navigator.pop(context);
+    },
+  );
+} catch (e) {
+  showSnackBar(context, e.toString());
+}
+
   }
 
   // get all the products
@@ -77,25 +79,26 @@ class AdminServices {
         'x-auth-token': userProvider.user.token,
       });
 
-      httpErrorHandle(
-        response: res,
-        context: context,
-        onSuccess: () {
-          for (int i = 0; i < jsonDecode(res.body).length; i++) {
-            productList.add(
-              Product.fromJson(
-                jsonEncode(
-                  jsonDecode(res.body)[i],
-                ),
-              ),
-            );
-          }
-        },
-      );
-    } catch (e) {
-      showSnackBar(context, e.toString());
-    }
-    return productList;
+    httpErrorHandle(
+    response: res,
+    context: context,
+    onSuccess: () {
+      for (int i = 0; i < jsonDecode(res.body).length; i++) {
+        productList.add(
+          Product.fromJson(
+            jsonEncode(
+              jsonDecode(res.body)[i],
+            ),
+          ),
+        );
+      }
+    },
+  );
+} catch (e) {
+  showSnackBar(context, e.toString());
+}
+return productList;
+
   }
 
   void deleteProduct({
@@ -105,17 +108,19 @@ class AdminServices {
   }) async {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
 
-    try {
-      http.Response res = await http.post(
-        Uri.parse('$uri/admin/delete-product'),
-        headers: {
-          'Content-Type': 'application/json; charset=UTF-8',
-          'x-auth-token': userProvider.user.token,
-        },
-        body: jsonEncode({
-          'id': product.id,
-        }),
-      );
+  try {
+  http.Response res = await http.post(
+    Uri.parse('$uri/admin/delete-product'),
+    headers: {
+      'Content-Type': 'application/json; charset=UTF-8',
+      'x-auth-token': userProvider.user.token,
+    },
+    body: jsonEncode({
+      'id': product.id,
+    }),
+  );
+
+
 
       httpErrorHandle(
         response: res,
